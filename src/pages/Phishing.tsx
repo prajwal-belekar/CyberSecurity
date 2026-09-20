@@ -1,0 +1,178 @@
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { Crosshair, Globe, ShieldAlert } from 'lucide-react';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
+import { routeMetaFor } from '@/app/router/navigation';
+import { Panel } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { SectionRule, KeyValueGrid } from '@/components/ui/KeyValue';
+import { URLAnalyzer } from '@/components/phishing/URLAnalyzer';
+import { RiskScore, VERDICT_META } from '@/components/phishing/RiskScore';
+import { URLIndicators, UrlInformation } from '@/components/phishing/URLIndicators';
+import { ScanHistory } from '@/components/phishing/ScanHistory';
+import { phishingApi } from '@/services/phishingApi';
+import { useToast } from '@/store/ToastContext';
+import { queryKeys } from '@/services/queryKeys';
+import { cn } from '@/utils/cn';
+import type { PhishingAnalysis, PhishingScanRecord } from '@/types/phishing';
+
+/** Phishing Detector — analyze, explain, then compare against history. */
+export default function Phishing() {
+  const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
+  const [analysis, setAnalysis] = useState<PhishingAnalysis | null>(null);
+  const toast = useToast();
+
+  const meta = routeMetaFor('/phishing');
+  const verdictMeta = analysis ? VERDICT_META[analysis.verdict] : null;
+
+  const handleResult = (result: PhishingAnalysis) => {
+    setAnalysis(result);
+    queryClient.invalidateQueries({ queryKey: queryKeys.phishingHistory() });
+  };
+
+  const replayRecord = (record: PhishingScanRecord) => {
+    setAnalysis(null);
+    void phishingApi.analyze(record.url).then((res) => {
+      if (res.ok && res.analysis) handleResult(res.analysis);
+      else toast.error('Re-analysis failed', res.reason ?? 'That target could not be re-analyzed.');
+    }).catch((err: Error) => toast.error('Re-analysis failed', err.message));
+  };
+
+  return (
+    <div className="space-y-2.5 p-2.5 sm:p-3">
+      <Breadcrumbs items={meta.segments} />
+      <PageHeader
+        title="Phishing Detector"
+        description="Assess a link for credential harvesting and brand impersonation."
+        status={
+          <span className="inline-flex items-center gap-1.5 rounded-[2px] border border-line-2 bg-panel px-1.5 py-[1px]">
+            <Globe className="size-2.5 text-cyber" aria-hidden />
+            <span className="text-[11px] text-ink-3">Analyzer ready</span>
+          </span>
+        }
+      />
+
+      <Panel
+        title="URL Analyzer"
+        icon={<Crosshair className="size-3.5" aria-hidden />}
+        className="min-w-0"
+        actions={
+          analysis ? (
+            <Button variant="ghost" size="xs" onClick={() => setAnalysis(null)}>Clear result</Button>
+          ) : undefined
+        }
+      >
+        <URLAnalyzer onResult={handleResult} initialUrl={searchParams.get('url') ?? undefined} />
+      </Panel>
+
+      {analysis ? (
+        <>
+          {/* Threat assessment */}
+          <div className="grid min-w-0 gap-2.5 lg:grid-cols-3">
+            <Panel
+              title="Threat Assessment"
+              icon={<ShieldAlert className="size-3.5" aria-hidden />}
+              className="min-w-0"
+              accent={analysis.riskScore >= 60 ? 'critical' : analysis.riskScore >= 35 ? 'high' : 'term'}
+            >
+              <div className="flex flex-col items-center gap-3 py-1">
+                <RiskScore score={analysis.riskScore} verdict={analysis.verdict} confidence={analysis.confidence} />
+                <div className="w-full">
+                  <SectionRule className="mb-1.5">Recommendation</SectionRule>
+                  <p className="mono text-[10.5px] leading-relaxed text-ink-2">{analysis.recommendation}</p>
+                </div>
+                {analysis.brandImpersonated ? (
+                  <div className="w-full rounded-[2px] border border-critical/35 bg-critical/[0.06] px-2 py-1.5">
+                    <p className="text-[11px] font-bold tracking-[0.02em] text-critical">Brand impersonated</p>
+                    <p className="mono mt-0.5 text-[11px] text-ink-2">{analysis.brandImpersonated}</p>
+                  </div>
+                ) : null}
+              </div>
+            </Panel>
+
+            <Panel title="URL Information" className="min-w-0">
+              <UrlInformation
+                analysis={{
+                  url: analysis.url,
+                  urlInfo: {
+                    protocol: analysis.urlInfo.protocol,
+                    domain: analysis.urlInfo.domain,
+                    subdomain: analysis.urlInfo.subdomain,
+                    tld: analysis.urlInfo.tld,
+                    path: analysis.urlInfo.path,
+                    query: analysis.urlInfo.query,
+                    length: String(analysis.urlInfo.length),
+                    domainAge: analysis.urlInfo.domainAge,
+                    registrar: analysis.urlInfo.registrar,
+                  },
+                  certificate: analysis.certificate,
+                }}
+              />
+            </Panel>
+
+            <Panel title="Analysis Pipeline" className="min-w-0">
+              <ol className="space-y-1">
+                {analysis.scanSteps.map((step) => (
+                  <li key={step.index} className="flex items-baseline gap-2 border-b border-line pb-1 last:border-b-0">
+                    <span className="mono tnum shrink-0 text-[11px] text-ink-4">[{String(step.index).padStart(2, '0')}]</span>
+                    <span className="mono min-w-0 flex-1 truncate text-[11px] text-ink-2">{step.label}</span>
+                    <span
+                      className={cn(
+                        'mono shrink-0 text-[11px] font-bold tracking-[0.01em] uppercase',
+                        step.state === 'ok' ? 'text-term' : step.state === 'warning' ? 'text-medium' : 'text-critical',
+                      )}
+                    >
+                      {step.state === 'ok' ? 'OK' : step.state === 'warning' ? 'WARNING' : 'FAIL'}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <div className="mt-2.5">
+                <SectionRule className="mb-1.5">Related intelligence</SectionRule>
+                {analysis.relatedThreatIds.length ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {analysis.relatedThreatIds.map((id) => (
+                      <a key={id} href={`/threats/${id}`} className="mono rounded-[2px] border border-high/35 bg-high/10 px-1.5 py-[2px] text-[11px] tracking-[0.01em] text-high uppercase transition-colors hover:bg-high/20">
+                        {id}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="mono text-[10.5px] text-ink-4">No linked threat records.</p>
+                )}
+              </div>
+              <div className="mt-2.5">
+                <KeyValueGrid
+                  columns={1}
+                  rows={[
+                    { label: 'Analysis ID', value: analysis.id, copy: analysis.id },
+                    { label: 'Analyzed', value: new Date(analysis.analyzedAt).toLocaleString('en-GB') },
+                  ]}
+                />
+              </div>
+            </Panel>
+          </div>
+
+          <Panel title={`Indicators — ${verdictMeta?.label ?? ''}`} icon={<ShieldAlert className="size-3.5" aria-hidden />} className="min-w-0">
+            <URLIndicators indicators={analysis.indicators} />
+          </Panel>
+        </>
+      ) : (
+        <Panel className="min-w-0">
+          <EmptyState
+            icon={<Crosshair className="size-4" aria-hidden />}
+            title="No analysis yet"
+            description="Enter a URL above and run the analyzer. Risk score, URL decomposition, indicator weights and a recommendation will appear here."
+            prompt
+          />
+        </Panel>
+      )}
+
+      <ScanHistory onSelect={replayRecord} />
+    </div>
+  );
+}

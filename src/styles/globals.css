@@ -1,0 +1,363 @@
+@import 'tailwindcss';
+
+/* =====================================================================
+   CYBERSENTinel DESIGN SYSTEM
+   Dark-first SOC / operator-workstation visual language.
+   70% professional security tool · 20% hacker terminal · 10% cyberpunk
+   ===================================================================== */
+
+@theme {
+  /* ---------- surfaces ---------- */
+  --color-void: #08090b;
+  --color-base: #0c0e11;
+  --color-panel: #11141a;
+  --color-panel-2: #151a21;
+  --color-raised: #1b212a;
+
+  /* ---------- borders ---------- */
+  --color-line: #242c35;
+  --color-line-2: #2e3841;
+  --color-line-3: #3b4650;
+
+  /* ---------- text ---------- */
+  --color-ink: #e6ebf1;
+  --color-ink-2: #aeb9c6;
+  --color-ink-3: #97a2af;
+  --color-ink-4: #828d9a;
+
+  /* ---------- terminal accents ---------- */
+  --color-term: #3fb37f;
+  --color-term-dim: #2f8a61;
+  --color-cyber: #4a9ec4;
+  --color-volt: #5d8bd7;
+  --color-ai: #9481c6;
+
+  /* ---------- semantic severity ---------- */
+  --color-critical: #de6375;
+  --color-high: #dd8a52;
+  --color-medium: #d0a94f;
+  --color-low: #5fae7a;
+  --color-info: #4f9ac4;
+  --color-safe: #3fb37f;
+
+  /* ---------- status ---------- */
+  --color-ok: #3fb37f;
+  --color-warn: #d0a94f;
+  --color-err: #de6375;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo,
+    Consolas, 'Liberation Mono', monospace;
+
+  --radius-panel: 3px;
+
+  --animate-blink: blink 1.05s steps(2, start) infinite;
+  --animate-pulse-dot: pulseDot 2.2s ease-in-out infinite;
+  --animate-sweep: sweep 1.6s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+  50% { opacity: 0.55; box-shadow: 0 0 0 3px transparent; }
+}
+
+/* ------------------------------------------------------------------ */
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    border-color: var(--color-line);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-void);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow: hidden; /* app shell manages its own scroll containers */
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  button, input, select, textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  ::selection {
+    background: rgba(74, 158, 196, 0.26);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-term);
+    outline-offset: 2px;
+  }
+
+  /* thin tactical scrollbars */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-base);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-2);
+    border: 2px solid var(--color-base);
+    border-radius: 0;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-line-3);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-2) var(--color-base);
+  }
+}
+
+@layer components {
+  /* ---------- Panels: thin-bordered tactical surfaces ---------- */
+  .panel {
+    position: relative;
+    background-color: var(--color-panel);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-panel);
+  }
+
+  .panel-inset {
+    background-color: var(--color-base);
+    border: 1px solid var(--color-line);
+    border-radius: 2px;
+  }
+
+  .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-panel-2);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-ink-2);
+  }
+
+  /* ---------- Typography helpers ---------- */
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+  }
+
+  .label-xs {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-ink-3);
+  }
+
+  /* Technical key/value field labels — the `SOURCE 192.168.1.42` register.
+     Monospace + caps is deliberate here: these label machine data, not prose.
+     Tracking stays tight (0.04em) so they read as labels, not shouting. */
+  .field-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+    white-space: nowrap;
+  }
+
+  .section-rule {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-ink-3);
+  }
+  /* Faint engineering-grid texture for the void background (spec §27).
+     Static and ~3% alpha: reads as technical paper in the gutters between
+     opaque panels, never as decoration. No animation, so reduced-motion
+     is not a factor. Remove the class from AppLayout to drop it entirely. */
+  .workspace-grid {
+    background-image:
+      linear-gradient(to right, rgba(148, 163, 184, 0.028) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.028) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Box-drawing lead-in: terminal flavour without shouting the label. */
+  .section-rule::before {
+    content: '\2500\2500';
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: -0.06em;
+    color: var(--color-line-3);
+  }
+  .section-rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-line);
+  }
+
+  /* ---------- Data grid ---------- */
+  .grid-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+  }
+  .grid-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-base);
+    border-bottom: 1px solid var(--color-line-2);
+    padding: 6px 10px;
+    text-align: left;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-ink-3);
+    white-space: nowrap;
+  }
+  .grid-table tbody td {
+    border-bottom: 1px solid var(--color-line);
+    padding: 6px 10px;
+    vertical-align: middle;
+    color: var(--color-ink-2);
+  }
+  .grid-table tbody tr {
+    transition: background-color 120ms ease;
+  }
+  .grid-table tbody tr:hover {
+    background-color: var(--color-panel-2);
+  }
+  .grid-table tbody tr[data-selected='true'] {
+    background-color: rgba(74, 158, 196, 0.09);
+    box-shadow: inset 2px 0 0 var(--color-cyber);
+  }
+
+  /* density variants driven by the Settings → Density control */
+  .density-compact .grid-table tbody td { padding: 4px 10px; font-size: 11.5px; }
+  .density-cozy .grid-table tbody td { padding: 9px 10px; font-size: 12.5px; }
+
+  /* ---------- Terminal output ---------- */
+  .term-line {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .prompt {
+    color: var(--color-term);
+  }
+
+  .caret {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: var(--color-term);
+    vertical-align: -2px;
+    animation: var(--animate-blink);
+  }
+
+  /* ---------- Meters ---------- */
+  .meter {
+    font-family: var(--font-mono);
+    letter-spacing: -0.06em;
+    font-size: 11px;
+  }
+
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .tnum { font-variant-numeric: tabular-nums; }
+
+}
+
+/* ------------------------------------------------------------------
+   Reduced motion (WCAG 2.3.3 / spec §30).
+   Framer Motion handles its own animations via <MotionConfig
+   reducedMotion="user">; this covers the CSS keyframes — caret blink,
+   status pulse and the skeleton sweep.
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  /* Mirrored below for html[data-motion='reduced'] — the in-app toggle. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Keep the terminal caret visible rather than frozen mid-blink. */
+  .caret {
+    animation: none !important;
+    opacity: 1;
+  }
+}
+
+/* In-app equivalent of the media query above, driven by
+   Settings → Reduce motion (AppLayout writes html[data-motion]). */
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+html[data-motion='reduced'] .caret {
+  animation: none !important;
+  opacity: 1;
+}

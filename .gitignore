@@ -1,0 +1,14 @@
+node_modules
+**/.venv
+**/__pycache__
+*.pyc
+dist
+dist-ssr
+coverage
+*.local
+.env
+.env.*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+.vite
