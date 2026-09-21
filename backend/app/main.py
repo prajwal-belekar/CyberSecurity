@@ -6,6 +6,10 @@ from app.database import engine, Base
 from app.routers import auth
 # Import models to register them with Base.metadata
 from app.models import User
+from app.models import SecurityEvent
+from app.models import Threat
+from app.models import Incident
+from app.models import Indicator
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

@@ -7,6 +7,12 @@ from alembic import context
 
 from app.database import Base
 from app.config import settings
+# Import models to register them with Base.metadata
+from app.models import User
+from app.models import SecurityEvent
+from app.models import Threat
+from app.models import Incident
+from app.models import Indicator
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
