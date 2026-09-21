@@ -12,3 +12,4 @@ coverage
 .DS_Store
 *.tsbuildinfo
 .vite
+*.db
