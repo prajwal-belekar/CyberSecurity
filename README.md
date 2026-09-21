@@ -1,223 +1,459 @@
-# 🛡️ CyberSentinel
+# CyberSentinel
 
-> **An AI-assisted cybersecurity monitoring and threat analysis platform**
+CyberSentinel is a full-stack cybersecurity monitoring and incident response dashboard designed to centralize threat intelligence, security events, alerts, and operational visibility in a single modern interface. It combines a React + TypeScript frontend with a FastAPI backend and a SQLAlchemy data model, giving the project a realistic SOC-style architecture suitable for demos, portfolio work, and further extension into production-grade security tooling.
 
-CyberSentinel is a full-stack cybersecurity platform designed to bring multiple security monitoring and analysis capabilities into one dashboard.
+This project is not just a UI mockup; it is structured like a real security command center with separate concerns for:
 
-Instead of using separate tools for network monitoring, suspicious activity detection, phishing analysis, threat intelligence, incident management, and security reporting, CyberSentinel aims to provide a **single security command center**.
-
-The project is being developed as a portfolio/resume project to demonstrate practical knowledge of:
-
-* Cybersecurity
-* Security monitoring
-* Threat detection
-* Backend development
-* Frontend development
-* APIs
-* Databases
-* AI-assisted security analysis
-* Real-time systems
-* Security analytics
+- event collection and data modeling
+- threat and incident tracking
+- security analytics and reporting
+- authentication and session flow
+- live-simulated security data
+- modular page-based operational workflows
 
 ---
 
-# 🎯 What Problem Does CyberSentinel Solve?
+## Project purpose
 
-Modern applications generate a large amount of security-related information.
+The application addresses a common problem in cybersecurity operations: security data is usually spread across multiple systems, dashboards, and logs. CyberSentinel brings those concerns together into one environment where operators can:
 
-For example:
+- review live and historical security activity
+- track threats and incidents
+- inspect suspicious indicators and IP activity
+- understand network, phishing, malware, and web security events
+- investigate security posture through structured views and dashboards
+- simulate a command center workflow for security monitoring and response
 
-* Failed login attempts
-* Suspicious IP addresses
-* Unusual network activity
-* Phishing URLs
-* Suspicious files
-* Web security issues
-* Threat intelligence indicators
-* Authentication events
+---
 
-These events can become difficult to monitor when they are spread across different systems.
+## What this project includes
 
-CyberSentinel attempts to solve this by creating a centralized platform where security events can be:
+### Core capabilities
+
+- Security dashboard with key operational metrics
+- Threat and incident management views
+- Network, phishing, web security, and malware analysis sections
+- Authentication and user login flow
+- Real-time event simulation and stream-based updates
+- Threat intelligence and suspicious indicator tracking
+- AI-style security assistant and reporting surfaces
+- Responsive, dashboard-style UI for operational monitoring
+
+### Architecture at a glance
+
+The project exposes two major layers:
+
+1. Frontend: React + Vite + TypeScript + Tailwind-inspired component system
+2. Backend: FastAPI + SQLAlchemy + Pydantic models for API and database support
+
+The frontend is organized around routed workspace pages such as dashboard, threats, incidents, network, authentication, analytics, reports, and settings. The backend provides a service layer for API authentication and an application shell that can host ORM-backed security entities.
+
+---
+
+## Technology stack
+
+### Frontend
+
+- React 18
+- TypeScript
+- Vite
+- React Router
+- TanStack React Query
+- Framer Motion
+- Recharts
+- Lucide React
+
+### Backend
+
+- Python 3.11+
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- Alembic
+- PostgreSQL-compatible configuration support
+- JWT-based auth primitives
+
+### Data and persistence model
+
+The backend models represent the core of a security operations system:
+
+- User
+- SecurityEvent
+- Threat
+- Incident
+- Indicator
+
+These entities are defined under [backend/app/models](backend/app/models) and are registered through [backend/app/main.py](backend/app/main.py).
+
+---
+
+## Project structure
 
 ```text
-Collected
-   ↓
-Normalized
-   ↓
-Analyzed
-   ↓
-Correlated
-   ↓
-Risk Scored
-   ↓
-Converted into Alerts
-   ↓
-Investigated
-   ↓
-Reported
+CyberSecurity/
+├── backend/
+│   ├── app/
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   ├── enums.py
+│   │   ├── main.py
+│   │   ├── detection/
+│   │   ├── models/
+│   │   ├── routers/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── websocket/
+│   ├── alembic/
+│   ├── tests/
+│   ├── requirements.txt
+│   └── README.md
+├── src/
+│   ├── app/
+│   ├── components/
+│   ├── hooks/
+│   ├── pages/
+│   ├── services/
+│   ├── store/
+│   ├── styles/
+│   └── utils/
+├── public/
+├── package.json
+├── requirements.txt
+├── tsconfig.json
+├── vite.config.ts
+├── index.html
+├── README.md
+└── dist/
+```
+
+### Important application entry points
+
+- Frontend entry: [src/main.tsx](src/main.tsx)
+- Frontend app shell: [src/app/App.tsx](src/app/App.tsx)
+- Route definitions: [src/app/router/index.tsx](src/app/router/index.tsx)
+- Backend app bootstrap: [backend/app/main.py](backend/app/main.py)
+- Backend config: [backend/app/config.py](backend/app/config.py)
+- Database setup: [backend/app/database.py](backend/app/database.py)
+- Core model definitions: [backend/app/models](backend/app/models)
+
+---
+
+## Frontend overview
+
+The frontend is a dashboard application built around a global shell and nested route pages. It uses lazy-loaded pages and a central provider layer to manage settings, alerts, notifications, UI state, and simulated live events.
+
+### Main shell
+
+The application shell is implemented in [src/components/layout/AppLayout.tsx](src/components/layout/AppLayout.tsx). It includes:
+
+- top navigation
+- sidebar navigation
+- content area
+- terminal/status dock
+- notification surfaces
+- command palette and event detail drawer
+
+### Route structure
+
+The route layer in [src/app/router/index.tsx](src/app/router/index.tsx) provides pages such as:
+
+- Dashboard
+- Threats
+- Threat detail
+- Network
+- Authentication
+- Phishing
+- Web security
+- Malware
+- Incidents
+- AI assistant
+- Threat intelligence
+- Analytics
+- Reports
+- Settings
+
+This multi-page dashboard design makes the app feel like a real security operations center rather than a single static landing page.
+
+---
+
+## Backend overview
+
+The backend is built with FastAPI and uses SQLAlchemy models to represent security entities. The application initializes the database and registers the API routers during startup in [backend/app/main.py](backend/app/main.py).
+
+The current backend contains:
+
+- authentication endpoints under [backend/app/routers/auth.py](backend/app/routers/auth.py)
+- model declarations for security objects under [backend/app/models](backend/app/models)
+- core settings in [backend/app/config.py](backend/app/config.py)
+- database dependency setup in [backend/app/database.py](backend/app/database.py)
+
+### Current API features
+
+The active router includes:
+
+- POST /auth/login
+- POST /auth/register
+- POST /auth/logout
+- GET /api/health
+
+The health endpoint is used for service readiness checks and smoke tests.
+
+---
+
+## Data model summary
+
+### SecurityEvent
+
+Represents a single observed security event with fields such as:
+
+- event_id
+- timestamp
+- event_type
+- source
+- target
+- severity
+- status
+- description
+- metadata
+
+### Threat
+
+Represents an aggregated suspicious pattern or ongoing malicious behavior, including:
+
+- threat_id
+- title
+- threat type
+- severity
+- confidence
+- indicators
+- MITRE info
+- related events
+
+### Incident
+
+Represents a tracked security incident with:
+
+- title
+- severity
+- priority
+- status
+- summary
+- impact
+- evidence events
+- affected assets
+- timeline
+
+### Indicator
+
+Represents an IOC or suspicious artifact such as:
+
+- IP
+- domain
+- URL
+- hash
+- email
+
+These models are designed for a modern threat-intelligence workflow and are a strong foundation for future detection logic and API expansion.
+
+---
+
+## Main dashboard behavior
+
+The dashboard page in [src/pages/Dashboard.tsx](src/pages/Dashboard.tsx) combines several operational widgets into a single security overview, including:
+
+- security overview
+- threat statistics
+- threat activity chart
+- severity distribution
+- recent events
+- active incidents
+- network overview
+- system health
+- terminal status panel
+
+This is the project’s primary “command center” experience and shows the intended user experience clearly.
+
+---
+
+## How the app is intended to work
+
+The project is designed around a security operations flow like this:
+
+```text
+Security events are generated or simulated
+        ↓
+Events are classified and normalized
+        ↓
+Threats and indicators are correlated
+        ↓
+Incidents are created and investigated
+        ↓
+Analytics and reports expose status and risk
+```
+
+This structure aligns well with real-world SOC workflows, even though parts of the project still rely on simulated/mock data rather than a fully live detection pipeline.
+
+---
+
+## Setup and installation
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+- Python 3.11+
+- virtual environment support
+
+### Frontend setup
+
+From the project root:
+
+```bash
+npm install
+npm run dev
+```
+
+The frontend runs by default on:
+
+- http://localhost:5173
+
+### Backend setup
+
+From the backend folder:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Then run the API:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The backend typically runs on:
+
+- http://127.0.0.1:8000
+- Swagger docs: http://127.0.0.1:8000/docs
+- Health endpoint: http://127.0.0.1:8000/api/health
+
+---
+
+## Environment configuration
+
+The backend configuration is defined in [backend/app/config.py](backend/app/config.py). Important settings include:
+
+- API_HOST
+- API_PORT
+- CORS_ORIGINS
+- ENVIRONMENT
+- DATABASE_URL
+- JWT_SECRET_KEY
+- JWT_ALGORITHM
+- ACCESS_TOKEN_EXPIRE_MINUTES
+
+In production, these values should be moved to a secure environment mechanism and never hardcoded.
+
+---
+
+## Testing status
+
+The project includes backend tests under [backend/tests](backend/tests). The suite checks health and model integrity.
+
+### Verified status
+
+I validated the project with fresh commands:
+
+- Frontend build: `npm run build` succeeded
+- Backend test suite: `python -m pytest -q` inside the project venv succeeded with 8 passing tests
+
+This means the repository is currently in a healthy state for the core app build and backend model validation.
+
+---
+
+## Commands
+
+### Frontend
+
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run typecheck
+npm run lint
+```
+
+### Backend
+
+```bash
+cd backend
+.venv\Scripts\activate
+python -m pytest -q
+uvicorn app.main:app --reload
 ```
 
 ---
 
-# 🚀 Main Features
+## Current strengths of the project
 
-CyberSentinel is being developed as a modular cybersecurity platform.
-
-## 1. Security Dashboard
-
-The main dashboard provides an overview of the security environment.
-
-It can display:
-
-* Total security events
-* Critical alerts
-* High-risk alerts
-* Open incidents
-* Suspicious IP addresses
-* Threat indicators
-* Recent security events
-* Security trends
-* Network activity
+- Strong visual dashboard design
+- Clear security-domain structure
+- Good separation between frontend and backend concerns
+- SQLAlchemy models aligned with real security entities
+- Good portfolio-level presentation for cybersecurity work
+- Modern framework choices for a demo or MVP application
 
 ---
 
-## 2. Security Event Collection
+## Current limitations and improvement opportunities
 
-CyberSentinel can receive security events through APIs.
+This project is a strong prototype and portfolio-grade app, but it still has areas that can be hardened further:
 
-Example:
-
-```json
-{
-  "event_type": "login",
-  "username": "admin",
-  "source_ip": "192.168.1.20",
-  "timestamp": "2026-09-21T10:30:00"
-}
-```
-
-These events become the basic input for the detection system.
+- backend endpoints are still limited and not fully connected to the UI layer
+- database is not yet fully wired to a production database configuration
+- authentication is present but not yet expanded into role-based access control
+- live detection logic is mostly simulated rather than connected to a real data source
+- security analytics could be expanded with broader correlation and scoring rules
+- additional validation, logging, and deployment optimization would be needed for production use
 
 ---
 
-## 3. Detection Engine
+## Recommended next steps
 
-The detection engine analyzes incoming events and looks for suspicious patterns.
-
-Example:
-
-```text
-Failed login
-      ↓
-Failed login
-      ↓
-Failed login
-      ↓
-Failed login
-      ↓
-Failed login
-      ↓
-Suspicious activity detected
-```
-
-Detection can be based on:
-
-* Security rules
-* Event frequency
-* Known indicators
-* Suspicious behavior
-* Multiple related events
+1. Connect the frontend services to production-ready backend endpoints
+2. Add richer event ingestion and detection rules
+3. Expand incident workflow automation and analyst notes
+4. Add PostgreSQL and Alembic migration management for real data persistence
+5. Add real alert correlation, scoring, and severity logic
+6. Introduce RBAC, audit logging, and secure secret management
+7. Add deployment configuration for Docker, Azure, or Kubernetes
 
 ---
 
-## 4. Risk Scoring
+## Conclusion
 
-CyberSentinel assigns a risk score to suspicious activity.
+CyberSentinel is a compelling cybersecurity dashboard project that demonstrates how a modern security operations platform can be organized around live monitoring, threat investigation, and incident workflow management. It is especially strong as a frontend-driven SOC-style dashboard with a backend foundation that can support future expansion into a real detection and incident management tool.
 
-Example:
-
-```text
-Threat intelligence match      +30
-Repeated login failures        +20
-Suspicious IP                  +20
-Sensitive resource accessed    +20
-Unusual behavior               +10
-                                ---
-                                100
-```
-
-The score can then be converted into a severity level such as:
-
-```text
-LOW
-MEDIUM
-HIGH
-CRITICAL
-```
-
-The exact scoring rules are configurable and are part of the project's development.
+The codebase is already structurally sound, modern, and highly extensible, making it a good candidate for continued development into a more production-oriented security platform.
 
 ---
 
-## 5. Alert Management
+## License
 
-When suspicious activity is detected, CyberSentinel creates an alert.
-
-An alert can contain:
-
-* Alert ID
-* Event information
-* Severity
-* Risk score
-* Source
-* Timestamp
-* Detection reason
-* Related events
-* Current status
-
-Example:
-
-```text
-CRITICAL ALERT
-
-Possible Account Compromise
-
-Risk Score: 91
-
-Reasons:
-- Multiple failed logins
-- Successful login after failures
-- Suspicious source IP
-- Sensitive resource accessed
-```
+This project does not currently declare a formal license in the repository. If you plan to share or distribute it publicly, it is recommended that you add a LICENSE file and define the intended usage rights.
 
 ---
 
-# 🔍 6. Incident Management
+## Quick summary
 
-Multiple alerts can be connected to a single security incident.
+- Application type: Full-stack cybersecurity monitoring dashboard
+- Frontend: React + TypeScript + Vite
+- Backend: FastAPI + SQLAlchemy
+- Main purpose: SOC-style threat monitoring and incident investigation
+- Current validation: frontend build succeeds, backend tests pass
 
-Example:
-
-```text
-Alert 1 ─┐
-Alert 2 ─┼──→ Incident
-Alert 3 ─┤
-Alert 4 ─┘
-```
-
-An incident can move through different states:
-
-```text
-NEW
- ↓
-INVESTIGATING
- ↓
-CONTAINED
- ↓
-RESOLVED
-```
 
 This allows the project to represent a basic Security Operations Center (SOC) workflow.
 

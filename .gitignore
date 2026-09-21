@@ -13,3 +13,9 @@ coverage
 *.tsbuildinfo
 .vite
 *.db
+
+# Compiled JavaScript/JSX artifacts shadow TypeScript sources — never commit them.
+# The frontend is authored entirely in TypeScript (.ts/.tsx); any .js/.jsx under
+# src/ is generated output.
+/src/**/*.js
+/src/**/*.jsx

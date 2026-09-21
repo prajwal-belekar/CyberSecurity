@@ -1,6 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { cn } from '@/utils/cn';
-/** Never leave a blank screen: explain the absence and offer the next step. */
-export function EmptyState({ icon, title, description, action, className, compact, prompt }) {
-    return (_jsxs("div", { className: cn('flex flex-col items-center justify-center text-center', compact ? 'gap-1.5 px-3 py-6' : 'gap-2.5 px-6 py-12', className), role: "status", children: [icon ? (_jsx("div", { className: cn('flex items-center justify-center rounded-[2px] border border-line-2 bg-base text-ink-4', compact ? 'size-8' : 'size-11'), children: icon })) : null, _jsxs("div", { children: [_jsx("p", { className: cn('font-mono font-semibold tracking-[0.01em] text-ink-2 uppercase', compact ? 'text-[11px]' : 'text-xs'), children: title }), description ? (_jsx("p", { className: cn('mx-auto mt-1 max-w-sm leading-relaxed text-ink-4', compact ? 'text-[10.5px]' : 'text-[11.5px]'), children: description })) : null] }), action ? _jsx("div", { className: "mt-1", children: action }) : null, prompt ? (_jsxs("div", { className: "mono mt-1.5 flex items-baseline gap-1.5 text-[11px]", "aria-hidden": true, children: [_jsx("span", { className: "prompt", children: "root@cybersentinel:~$" }), _jsx("span", { className: "caret" })] })) : null] }));
-}
