@@ -30,4 +30,4 @@ class Threat(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
-    incident = relationship("Incident", foreign_keys=[incident_id])
+    incident = relationship("Incident", foreign_keys=[incident_id], back_populates="threats")

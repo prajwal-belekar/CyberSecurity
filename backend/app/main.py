@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import engine, Base
-from app.routers import auth
+from app.routers import auth, events, threats, incidents, indicators, ai
 # Import models to register them with Base.metadata
 from app.models import User
 from app.models import SecurityEvent
@@ -37,7 +37,12 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router)
+app.include_router(auth.router, prefix="/api")
+app.include_router(events.router, prefix="/api")
+app.include_router(threats.router, prefix="/api")
+app.include_router(incidents.router, prefix="/api")
+app.include_router(indicators.router, prefix="/api")
+app.include_router(ai.router, prefix="/api")
 
 @app.get('/api/health')
 async def health():

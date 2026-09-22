@@ -33,4 +33,4 @@ class Incident(Base):
     
     # Relationships
     evidence_events = relationship("SecurityEvent", secondary="incident_evidence", back_populates="incidents")
-    threats = relationship("Threat", foreign_keys="Threat.incident_id")
+    threats = relationship("Threat", foreign_keys="Threat.incident_id", back_populates="incident")
