@@ -10,6 +10,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/utils/cn';
 import { useUI } from '@/store/UIContext';
+import { useSettings } from '@/store/SettingsContext';
 import { useHotkey } from '@/hooks/useHotkey';
 import { searchApi, CATEGORY_LABELS, type SearchCategory, type SearchResult } from '@/services/searchApi';
 import { queryKeys } from '@/services/queryKeys';
@@ -23,7 +24,14 @@ interface Command {
   icon: ReactNode;
   group: string;
   keywords: string[];
+  /** Non-navigation action handled specially in activate(). */
+  action?: 'mode-simple' | 'mode-analyst';
 }
+
+const MODE_COMMANDS: Command[] = [
+  { id: 'c-mode-simple', label: 'Switch to Simple Mode', command: 'mode simple', to: '/dashboard', icon: <LayoutDashboard className="size-3.5" aria-hidden />, group: 'MODE', keywords: ['simple', 'mode', 'beginner', 'easy'], action: 'mode-simple' },
+  { id: 'c-mode-analyst', label: 'Switch to Analyst Mode', command: 'mode analyst', to: '/dashboard', icon: <Terminal className="size-3.5" aria-hidden />, group: 'MODE', keywords: ['analyst', 'mode', 'advanced', 'soc'], action: 'mode-analyst' },
+];
 
 const COMMANDS: Command[] = [
   { id: 'c-dashboard', label: 'Go to Dashboard', command: 'status', to: '/dashboard', icon: <LayoutDashboard className="size-3.5" aria-hidden />, group: 'NAVIGATE', keywords: ['home', 'overview', 'dashboard', 'status'] },
@@ -51,6 +59,7 @@ const COMMANDS: Command[] = [
  */
 export function CommandPalette() {
   const { paletteOpen, openPalette, closePalette, terminalDockOpen, toggleTerminalDock } = useUI();
+  const { settings, updateUIMode } = useSettings();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [cursor, setCursor] = useState(0);
@@ -76,14 +85,19 @@ export function CommandPalette() {
   });
 
   const commands = useMemo(() => {
+    // Always surface the opposite-mode switch first so users can get back.
+    const modeCmd = settings.uiMode === 'simple'
+      ? MODE_COMMANDS.find((c) => c.action === 'mode-analyst')!
+      : MODE_COMMANDS.find((c) => c.action === 'mode-simple')!;
+    const all = [modeCmd, ...COMMANDS];
     const q = query.trim().toLowerCase();
-    if (!q) return COMMANDS.slice(0, 9);
-    return COMMANDS.filter((c) =>
+    if (!q) return all.slice(0, 9);
+    return all.filter((c) =>
       c.label.toLowerCase().includes(q) ||
       c.command.toLowerCase().includes(q) ||
       c.keywords.some((k) => k.includes(q)),
     ).slice(0, 8);
-  }, [query]);
+  }, [query, settings.uiMode]);
 
   // Flat list for keyboard navigation: commands first, then grouped results.
   const flat = useMemo(() => {
@@ -104,6 +118,16 @@ export function CommandPalette() {
     const entry = flat[index];
     if (!entry) return;
     if (entry.kind === 'command') {
+      if (entry.item.action === 'mode-simple') {
+        updateUIMode('simple');
+        closePalette();
+        return;
+      }
+      if (entry.item.action === 'mode-analyst') {
+        updateUIMode('analyst');
+        closePalette();
+        return;
+      }
       if (entry.item.id === 'c-terminal') {
         if (!terminalDockOpen) toggleTerminalDock();
       }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Activity, AlarmClock, ArrowLeft, Brain, FileSearch, ServerCog, StickyNote, FileText } from 'lucide-react';
 import { useIncident, useIncidentEvidence } from '@/hooks/useIncidents';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -21,6 +21,8 @@ import { IncidentActions } from '@/components/incidents/IncidentActions';
 import { priorityMeta, slaState, statusMetaFor } from '@/utils/incidentMeta';
 import { formatTimestamp, formatRelative } from '@/utils/dates';
 import { cn } from '@/utils/cn';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleIncidentDetail from './SimpleIncidentDetail';
 import type { ReactNode } from 'react';
 
 type TabValue = 'overview' | 'timeline' | 'evidence' | 'assets' | 'notes' | 'ai';
@@ -28,7 +30,17 @@ type TabValue = 'overview' | 'timeline' | 'evidence' | 'assets' | 'notes' | 'ai'
 /** Incident Detail — case file with summary, timeline, evidence, assets, notes and AI triage. */
 export default function IncidentDetail() {
   const { incidentId: id = '' } = useParams<{ incidentId: string }>();
+  const [searchParams] = useSearchParams();
   const [tab, setTab] = useState<TabValue>('overview');
+  const { settings } = useSettings();
+
+  // Explicit URL query param mode override takes precedence over global setting
+  const modeOverride = searchParams.get('mode');
+  const effectiveMode = modeOverride === 'analyst' ? 'analyst' : modeOverride === 'simple' ? 'simple' : settings.uiMode;
+
+  if (effectiveMode === 'simple') {
+    return <SimpleIncidentDetail />;
+  }
 
   const incident = useIncident(id);
   const evidence = useIncidentEvidence(id);

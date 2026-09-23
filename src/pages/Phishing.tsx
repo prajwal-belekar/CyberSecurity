@@ -18,9 +18,14 @@ import { useToast } from '@/store/ToastContext';
 import { queryKeys } from '@/services/queryKeys';
 import { cn } from '@/utils/cn';
 import type { PhishingAnalysis, PhishingScanRecord } from '@/types/phishing';
+import { useSettings } from '@/store/SettingsContext';
+import SimplePhishing from './SimplePhishing';
 
 /** Phishing Detector — analyze, explain, then compare against history. */
 export default function Phishing() {
+  const { settings } = useSettings();
+  if (settings.uiMode === 'simple') return <SimplePhishing />;
+
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const [analysis, setAnalysis] = useState<PhishingAnalysis | null>(null);

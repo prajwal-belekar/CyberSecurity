@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { AppSettings } from '@/types/system';
+import type { AppSettings, UIMode } from '@/types/system';
 import { API_BASE_URL, API_MODE, API_TIMEOUT_MS } from '@/services/api';
 import { setFailureInjection } from '@/services/mockApi';
 
@@ -16,6 +16,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   liveEventStream: true,
   reduceMotion: false,
   showTerminalDock: true,
+  uiMode: 'analyst',
   notifications: {
     criticalAlerts: true,
     highAlerts: true,
@@ -31,6 +32,7 @@ interface SettingsContextValue {
   settings: AppSettings;
   update: (patch: Partial<AppSettings>) => void;
   updateNotifications: (patch: Partial<AppSettings['notifications']>) => void;
+  updateUIMode: (mode: UIMode) => void;
   reset: () => void;
   /** Demo-only failure injection so error states are reachable on purpose. */
   failureInjection: boolean;
@@ -80,6 +82,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setSettings((prev) => ({ ...prev, notifications: { ...prev.notifications, ...patch } }));
   }, []);
 
+  const updateUIMode = useCallback((mode: UIMode) => {
+    setSettings((prev) => ({ ...prev, uiMode: mode }));
+  }, []);
+
   const reset = useCallback(() => setSettings(DEFAULT_SETTINGS), []);
 
   const setFailureInjectionEnabled = useCallback((enabled: boolean) => {
@@ -88,8 +94,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ settings, update, updateNotifications, reset, failureInjection, setFailureInjectionEnabled }),
-    [settings, update, updateNotifications, reset, failureInjection, setFailureInjectionEnabled],
+    () => ({ settings, update, updateNotifications, updateUIMode, reset, failureInjection, setFailureInjectionEnabled }),
+    [settings, update, updateNotifications, updateUIMode, reset, failureInjection, setFailureInjectionEnabled],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

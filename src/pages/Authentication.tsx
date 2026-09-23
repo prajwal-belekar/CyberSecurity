@@ -16,9 +16,14 @@ import { LoginTimeline } from '@/components/authentication/LoginTimeline';
 import { authenticationApi } from '@/services/authenticationApi';
 import { queryKeys } from '@/services/queryKeys';
 import type { TimeRange } from '@/types/common';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleAuthentication from './SimpleAuthentication';
 
 /** Authentication Monitor — outcomes chart, hotspots, sequences and the login grid. */
 export default function Authentication() {
+  const { settings } = useSettings();
+  if (settings.uiMode === 'simple') return <SimpleAuthentication />;
+
   const [range, setRange] = useState<'24H' | '7D' | '30D'>('24H');
   const meta = routeMetaFor('/authentication');
 

@@ -7,6 +7,7 @@ import { cn } from '@/utils/cn';
 import { useClock, useIsMobile } from '@/hooks';
 import { useLive } from '@/store/LiveContext';
 import { useUI } from '@/store/UIContext';
+import { useSettings } from '@/store/SettingsContext';
 import { useHotkey } from '@/hooks/useHotkey';
 import { Dropdown } from '@/components/ui/Dropdown';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -34,6 +35,7 @@ export function TopBar() {
   const isMobile = useIsMobile();
   const { metrics, connected } = useLive();
   const { toggleSidebar, setMobileNavOpen, mobileNavOpen, openPalette, setNotificationsOpen, notificationsOpen, terminalDockOpen, toggleTerminalDock } = useUI();
+  const { settings, updateUIMode } = useSettings();
 
   useHotkey('ctrl+k', (e) => { e.preventDefault(); openPalette(); });
   useHotkey('ctrl+/', (e) => { e.preventDefault(); openPalette(); });
@@ -42,6 +44,8 @@ export function TopBar() {
   const cpuTone = metrics.cpu > 80 ? 'text-critical' : metrics.cpu > 60 ? 'text-medium' : 'text-term';
   const memTone = metrics.mem > 85 ? 'text-critical' : metrics.mem > 70 ? 'text-medium' : 'text-cyber';
   const netTone = metrics.netMbps > 45 ? 'text-medium' : 'text-cyber';
+
+  const currentMode = settings.uiMode;
 
   return (
     <header
@@ -143,6 +147,44 @@ export function TopBar() {
             <Terminal className="size-3.5" aria-hidden />
           </button>
         </Tooltip>
+
+        {/* Mode switcher — single segmented control (Simple ↔ Analyst) */}
+        <div
+          role="group"
+          aria-label="Interface mode"
+          className="inline-flex h-7 items-center gap-0.5 rounded-[2px] border border-line-2 bg-panel p-0.5"
+        >
+          <Tooltip content="Beginner-friendly layout with plain-language explanations" label="Simple Mode">
+            <button
+              type="button"
+              onClick={() => updateUIMode('simple')}
+              aria-pressed={currentMode === 'simple'}
+              className={cn(
+                'mono h-full rounded-[1px] px-1.5 text-[10px] font-semibold tracking-[0.04em] transition-colors',
+                currentMode === 'simple'
+                  ? 'border border-cyber/50 bg-cyber/12 text-cyber'
+                  : 'border border-transparent text-ink-4 hover:text-ink-2',
+              )}
+            >
+              SIMPLE
+            </button>
+          </Tooltip>
+          <Tooltip content="Dense SOC analyst command center" label="Analyst Mode">
+            <button
+              type="button"
+              onClick={() => updateUIMode('analyst')}
+              aria-pressed={currentMode === 'analyst'}
+              className={cn(
+                'mono h-full rounded-[1px] px-1.5 text-[10px] font-semibold tracking-[0.04em] transition-colors',
+                currentMode === 'analyst'
+                  ? 'border border-term/50 bg-term/12 text-term'
+                  : 'border border-transparent text-ink-4 hover:text-ink-2',
+              )}
+            >
+              ANALYST
+            </button>
+          </Tooltip>
+        </div>
 
         <Dropdown
           label="Notifications"

@@ -18,13 +18,13 @@ import { seededRandom, intBetween } from '@/utils/random';
 
 export const SUGGESTED_PROMPTS: SuggestedPrompt[] = [
   { id: 'q1', label: 'What happened?', prompt: 'What happened?' },
-  { id: 'q2', label: 'Why was this detected?', prompt: 'Why was this detected?' },
-  { id: 'q3', label: 'What evidence supports this?', prompt: 'What evidence supports this alert?' },
-  { id: 'q4', label: 'Show related events', prompt: 'Show related events.' },
-  { id: 'q5', label: 'Summarize this incident', prompt: 'Summarize this incident.' },
-  { id: 'q6', label: 'What should I investigate next?', prompt: 'What should I investigate next?' },
-  { id: 'q7', label: 'Is this a false positive?', prompt: 'Is this a false positive?' },
-  { id: 'q8', label: 'Map to MITRE ATT&CK', prompt: 'Map this activity to MITRE ATT&CK.' },
+  { id: 'q2', label: 'Is anything dangerous happening?', prompt: 'Is anything dangerous happening?' },
+  { id: 'q3', label: 'What needs my attention?', prompt: 'What needs my attention right now?' },
+  { id: 'q4', label: 'Why was this detected?', prompt: 'Why was this detected?' },
+  { id: 'q5', label: 'What should I do next?', prompt: 'What should I do next?' },
+  { id: 'q6', label: 'Explain this incident simply', prompt: 'Explain this incident in simple terms.' },
+  { id: 'q7', label: 'Show me the evidence', prompt: 'Show me the evidence.' },
+  { id: 'q8', label: 'Explain this without technical terms', prompt: 'Explain this without technical terms.' },
 ];
 
 export interface AiResponse {

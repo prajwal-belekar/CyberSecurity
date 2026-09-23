@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sidebar, SidebarDrawer } from './Sidebar';
 import { TopBar } from './TopBar';
@@ -21,13 +21,26 @@ import { useUI } from '@/store/UIContext';
  */
 export function AppLayout() {
   const location = useLocation();
-  const { settings } = useSettings();
+  const navigate = useNavigate();
+  const { settings, updateUIMode } = useSettings();
   const { setMobileNavOpen, activeEvent } = useUI();
 
   // Close transient surfaces whenever the route changes.
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname, setMobileNavOpen]);
+
+  // URL-driven modes: /page?mode=analyst|simple switches the interface and is
+  // consumed once so the flag cannot silently override a later manual choice.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const mode = params.get('mode');
+    if (mode !== 'analyst' && mode !== 'simple') return;
+    updateUIMode(mode);
+    params.delete('mode');
+    const query = params.toString();
+    navigate({ pathname: location.pathname, search: query ? `?${query}` : '' }, { replace: true });
+  }, [location.search, location.pathname, navigate, updateUIMode]);
 
   useEffect(() => {
     const reduce = settings.reduceMotion;
@@ -45,7 +58,7 @@ export function AppLayout() {
           <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain" tabIndex={-1}>
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
-                key={location.pathname}
+                key={`${settings.uiMode}|${location.pathname}`}
                 initial={{ opacity: 0, y: settings.reduceMotion ? 0 : 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: settings.reduceMotion ? 0 : -4 }}

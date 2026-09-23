@@ -14,9 +14,14 @@ import { NetworkEvents } from '@/components/network/NetworkEvents';
 import { NetworkLiveBadge, NetworkOverviewStats, NetworkThroughput } from '@/components/network/NetworkOverview';
 import { useNetworkSummary, useNetworkTopology } from '@/hooks/useNetworkEvents';
 import type { NetworkNode } from '@/types/network';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleNetwork from './SimpleNetwork';
 
 /** Network Monitor — topology canvas, throughput posture and flow grid. */
 export default function Network() {
+  const { settings } = useSettings();
+  if (settings.uiMode === 'simple') return <SimpleNetwork />;
+
   const topology = useNetworkTopology();
   const summary = useNetworkSummary();
   const [selected, setSelected] = useState<NetworkNode | null>(null);

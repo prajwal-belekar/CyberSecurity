@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { FolderKanban, LayoutDashboard, MoreHorizontal, Network, ShieldAlert } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { useSettings } from '@/store/SettingsContext';
 
 /**
  * Bottom navigation for the compact mobile terminal. Ordered by triage
@@ -8,14 +9,17 @@ import { cn } from '@/utils/cn';
  * dashboard, as required for small screens.
  */
 const ITEMS = [
-  { to: '/threats', label: 'THREATS', icon: ShieldAlert, priority: 1 },
-  { to: '/incidents', label: 'CASES', icon: FolderKanban, priority: 2 },
-  { to: '/dashboard', label: 'HOME', icon: LayoutDashboard, priority: 3 },
-  { to: '/network', label: 'NET', icon: Network, priority: 4 },
-  { to: '/ai-assistant', label: 'AI', icon: MoreHorizontal, priority: 5 },
+  { to: '/threats', label: { simple: 'ALERTS', analyst: 'THREATS' }, icon: ShieldAlert, priority: 1 },
+  { to: '/incidents', label: { simple: 'CASES', analyst: 'CASES' }, icon: FolderKanban, priority: 2 },
+  { to: '/dashboard', label: { simple: 'OVERVIEW', analyst: 'HOME' }, icon: LayoutDashboard, priority: 3 },
+  { to: '/network', label: { simple: 'NETWORK', analyst: 'NET' }, icon: Network, priority: 4 },
+  { to: '/ai-assistant', label: { simple: 'ASK', analyst: 'AI' }, icon: MoreHorizontal, priority: 5 },
 ];
 
 export function MobileNavigation() {
+  const { settings } = useSettings();
+  const simple = settings.uiMode === 'simple';
+
   return (
     <nav
       aria-label="Mobile navigation"
@@ -23,6 +27,7 @@ export function MobileNavigation() {
     >
       {ITEMS.map((item) => {
         const Icon = item.icon;
+        const label = typeof item.label === 'string' ? item.label : (simple ? item.label.simple : item.label.analyst);
         return (
           <NavLink
             key={item.to}
@@ -37,7 +42,7 @@ export function MobileNavigation() {
                 <span className={cn('relative flex size-5 items-center justify-center', isActive && 'text-term')} aria-hidden>
                   <Icon className="size-4" />
                 </span>
-                <span className="mono text-[10.5px] font-semibold tracking-[0.02em]">{item.label}</span>
+                <span className="mono text-[10.5px] font-semibold tracking-[0.02em]">{label}</span>
                 <span className={cn('h-px w-6 transition-colors', isActive ? 'bg-term' : 'bg-transparent')} aria-hidden />
               </>
             )}

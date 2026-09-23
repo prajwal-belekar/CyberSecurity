@@ -17,12 +17,17 @@ import { useThreatSummary } from '@/hooks/useSecurityEvents';
 import { SEVERITY_META } from '@/utils/severity';
 import type { Severity } from '@/types/common';
 import type { Threat, ThreatFilters as Filters } from '@/types/threat';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleThreats from './SimpleThreats';
 
 const PAGE_SIZE = 12;
 const EMPTY_FILTERS: Filters = {};
 
 /** Threat Monitor — summary, filters, and a sortable triage grid. */
 export default function Threats() {
+  const { settings } = useSettings();
+  if (settings.uiMode === 'simple') return <SimpleThreats />;
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [view, setView] = useState<'table' | 'cards'>('table');

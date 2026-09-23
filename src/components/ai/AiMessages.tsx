@@ -124,7 +124,8 @@ function MessageRow({ message }: { message: ChatMessage }) {
                     to={citation.href}
                     className="mono inline-flex items-center gap-1 rounded-[2px] border border-line-2 bg-raised px-1.5 py-[1px] text-[11px] text-ink-3 transition-colors hover:border-ai/40 hover:text-ai"
                   >
-                    {citation.label}<ExternalLink className="size-2" aria-hidden />
+                    <span>{citation.label}</span>
+                    <ExternalLink className="size-2" aria-hidden />
                   </Link>
                 ) : (
                   <span className="mono inline-flex items-center gap-1 rounded-[2px] border border-line-2 bg-raised px-1.5 py-[1px] text-[11px] text-ink-4">

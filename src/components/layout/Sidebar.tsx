@@ -4,6 +4,7 @@ import { cn } from '@/utils/cn';
 import { ALL_NAV_ITEMS, NAVIGATION } from '@/app/router/navigation';
 import { useUI } from '@/store/UIContext';
 import { useLive } from '@/store/LiveContext';
+import { useSettings } from '@/store/SettingsContext';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { useIncidentSummary } from '@/hooks/useIncidents';
 import { useThreatSummary } from '@/hooks/useSecurityEvents';
@@ -22,6 +23,41 @@ function NavBadge({ count, tone = 'critical' }: { count: number; tone?: 'critica
   );
 }
 
+/** Simple Mode bottom-of-rail switch — mirrors the TopBar segmented control. */
+function ModeSwitch({ simple }: { simple: boolean }) {
+  const { updateUIMode } = useSettings();
+  return (
+    <div
+      role="group"
+      aria-label="Interface mode"
+      className="mb-2 flex h-6 items-center gap-0.5 rounded-[2px] border border-line-2 bg-panel p-0.5"
+    >
+      <button
+        type="button"
+        onClick={() => updateUIMode('simple')}
+        aria-pressed={simple}
+        className={cn(
+          'mono h-full rounded-[1px] px-1.5 text-[10px] font-semibold tracking-[0.04em] transition-colors',
+          simple ? 'border border-cyber/50 bg-cyber/12 text-cyber' : 'border border-transparent text-ink-4 hover:text-ink-2',
+        )}
+      >
+        SIMPLE
+      </button>
+      <button
+        type="button"
+        onClick={() => updateUIMode('analyst')}
+        aria-pressed={!simple}
+        className={cn(
+          'mono h-full rounded-[1px] px-1.5 text-[10px] font-semibold tracking-[0.04em] transition-colors',
+          !simple ? 'border border-term/50 bg-term/12 text-term' : 'border border-transparent text-ink-4 hover:text-ink-2',
+        )}
+      >
+        ANALYST
+      </button>
+    </div>
+  );
+}
+
 /**
  * Command rail. Expanded shows the terminal-prefixed label; collapsed shows the
  * icon plus a tooltip. Group labels become hairline rules when collapsed.
@@ -29,8 +65,12 @@ function NavBadge({ count, tone = 'critical' }: { count: number; tone?: 'critica
 export function Sidebar() {
   const { sidebarCollapsed } = useUI();
   const { connected } = useLive();
+  const { settings } = useSettings();
   const { data: threatSummary } = useThreatSummary();
   const { data: incidentSummary } = useIncidentSummary();
+
+  const simple = settings.uiMode === 'simple';
+  const activeNav = NAVIGATION;
 
   const badges: Record<string, number> = {
     threats: (threatSummary?.critical ?? 0) + (threatSummary?.high ?? 0),
@@ -45,7 +85,7 @@ export function Sidebar() {
       aria-label="Primary navigation"
     >
       <nav className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden py-2 no-scrollbar">
-        {NAVIGATION.map((group) => (
+        {activeNav.map((group) => (
           <div key={group.id} className="mb-1.5">
             {sidebarCollapsed ? (
               <div className="mx-2.5 my-2 h-px bg-line" role="separator" aria-label={group.label} />
@@ -82,7 +122,15 @@ export function Sidebar() {
                           </span>
                         ) : null}
                         <Icon className="size-3.5 shrink-0" aria-hidden />
-                        {!sidebarCollapsed ? (
+                        {!sidebarCollapsed && simple ? (
+                          <span className="min-w-0 flex-1">
+                            <span className={cn('block truncate text-[12px] leading-tight font-medium', isActive ? 'text-term' : 'text-ink-2')}>
+                              {item.label}
+                            </span>
+                            <span className="block truncate text-[10px] leading-tight text-ink-4">{item.description}</span>
+                          </span>
+                        ) : null}
+                        {!sidebarCollapsed && !simple ? (
                           <span className="mono min-w-0 flex-1 truncate text-[10.5px] font-semibold tracking-[0.02em] uppercase">
                             {item.short}
                           </span>
@@ -123,6 +171,7 @@ export function Sidebar() {
 
       {/* System status footer */}
       <div className="shrink-0 border-t border-line bg-base px-2.5 py-2">
+        {!sidebarCollapsed && simple ? <ModeSwitch simple /> : null}
         {sidebarCollapsed ? (
           <Tooltip content={connected ? 'All subsystems operational' : 'Live feed paused'} side="right" label="System status">
             <span className="flex w-full items-center justify-center">
@@ -159,8 +208,11 @@ export function Sidebar() {
 export function SidebarDrawer() {
   const { mobileNavOpen, setMobileNavOpen } = useUI();
   const { connected } = useLive();
+  const { settings } = useSettings();
   const { data: threatSummary } = useThreatSummary();
   const { data: incidentSummary } = useIncidentSummary();
+  const simple = settings.uiMode === 'simple';
+  const activeNav = NAVIGATION;
   const badges: Record<string, number> = {
     threats: (threatSummary?.critical ?? 0) + (threatSummary?.high ?? 0),
     incidents: (incidentSummary?.open ?? 0) + (incidentSummary?.investigating ?? 0),
@@ -204,7 +256,7 @@ export function SidebarDrawer() {
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto py-2">
-              {NAVIGATION.map((group) => (
+              {activeNav.map((group) => (
                 <div key={group.id} className="mb-2">
                   <div className="mono mb-1 flex items-center gap-1.5 px-3 text-[10.5px] font-semibold tracking-[0.02em] text-ink-4 uppercase">
                     <span aria-hidden>──</span><span>{group.label}</span>
@@ -224,10 +276,23 @@ export function SidebarDrawer() {
                               isActive ? 'border-term bg-term/8 text-term' : 'border-transparent text-ink-3 hover:bg-panel-2 hover:text-ink',
                             )}
                           >
-                            <span className="mono w-3 text-[11px] text-ink-4" aria-hidden>&gt;</span>
-                            <Icon className="size-4 shrink-0" aria-hidden />
-                            <span className="mono min-w-0 flex-1 truncate text-[11px] font-semibold tracking-[0.01em] uppercase">{item.short}</span>
-                            {badge ? <NavBadge count={badge} /> : null}
+                            {({ isActive }) => (
+                              <>
+                                <span className="mono w-3 text-[11px] text-ink-4" aria-hidden>&gt;</span>
+                                <Icon className="size-4 shrink-0" aria-hidden />
+                                {simple ? (
+                                  <span className="min-w-0 flex-1">
+                                    <span className={cn('block truncate text-[12px] leading-tight font-medium', isActive ? 'text-term' : 'text-ink-2')}>
+                                      {item.label}
+                                    </span>
+                                    <span className="block truncate text-[10.5px] leading-tight text-ink-4">{item.description}</span>
+                                  </span>
+                                ) : (
+                                  <span className="mono min-w-0 flex-1 truncate text-[11px] font-semibold tracking-[0.01em] uppercase">{item.short}</span>
+                                )}
+                                {badge ? <NavBadge count={badge} /> : null}
+                              </>
+                            )}
                           </NavLink>
                         </li>
                       );
@@ -238,6 +303,7 @@ export function SidebarDrawer() {
             </div>
 
             <div className="shrink-0 border-t border-line px-3 py-2">
+              {simple ? <ModeSwitch simple /> : null}
               <div className="flex items-center gap-1.5">
                 <span className={cn('size-1.5 rounded-full', connected ? 'bg-term text-term' : 'bg-ink-4 text-ink-4')} aria-hidden />
                 <span className="mono text-[11px] font-semibold tracking-[0.01em] text-ink-2 uppercase">

@@ -11,6 +11,8 @@ import { EventStream } from '@/components/system/EventStream';
 import { Panel } from '@/components/ui/Card';
 import { Radio } from 'lucide-react';
 import { useUI } from '@/store/UIContext';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleDashboard from './SimpleDashboard';
 
 /**
  * Security Command Center.
@@ -21,6 +23,11 @@ import { useUI } from '@/store/UIContext';
  */
 export default function Dashboard() {
   const { openEvent } = useUI();
+  const { settings } = useSettings();
+
+  if (settings.uiMode === 'simple') {
+    return <SimpleDashboard />;
+  }
 
   return (
     <div className="space-y-2.5 p-2.5 sm:p-3">

@@ -29,6 +29,8 @@ export interface SystemHealth {
   database: { host: string; status: 'connected' | 'reconnecting'; records: number; replicationLagMs: number };
 }
 
+export type UIMode = 'simple' | 'analyst';
+
 export interface AppSettings {
   theme: 'terminal-dark' | 'high-contrast';
   density: 'compact' | 'normal' | 'cozy';
@@ -39,6 +41,7 @@ export interface AppSettings {
   liveEventStream: boolean;
   reduceMotion: boolean;
   showTerminalDock: boolean;
+  uiMode: UIMode;
   notifications: {
     criticalAlerts: boolean;
     highAlerts: boolean;

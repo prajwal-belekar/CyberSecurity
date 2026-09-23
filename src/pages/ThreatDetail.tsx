@@ -18,9 +18,14 @@ import { queryKeys } from '@/services/queryKeys';
 import { useUI } from '@/store/UIContext';
 import { formatRelative } from '@/utils/dates';
 import type { SecurityEvent } from '@/types/threat';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleThreatDetail from './SimpleThreatDetail';
 
 /** Threat investigation console — forensic view of one detection. */
 export default function ThreatDetail() {
+  const { settings } = useSettings();
+  if (settings.uiMode === 'simple') return <SimpleThreatDetail />;
+
   const { threatId } = useParams<{ threatId: string }>();
   const navigate = useNavigate();
   const { openEvent } = useUI();

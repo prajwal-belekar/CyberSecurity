@@ -14,9 +14,14 @@ import { priorityMeta } from '@/utils/incidentMeta';
 import { severityRank } from '@/utils/severity';
 import { formatRelative } from '@/utils/dates';
 import type { IncidentStatus } from '@/types/incident';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleIncidents from './SimpleIncidents';
 
 /** Incident Response — status board or full queue, both filterable. */
 export default function Incidents() {
+  const { settings } = useSettings();
+  if (settings.uiMode === 'simple') return <SimpleIncidents />;
+
   const meta = routeMetaFor('/incidents');
   const [view, setView] = useState<'board' | 'table'>('board');
   const [filters, setFilters] = useState<IncidentFilterState>(EMPTY_INCIDENT_FILTERS);

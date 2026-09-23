@@ -19,6 +19,8 @@ import { RuleEfficacy } from '@/components/analytics/RuleEfficacy';
 import { analyticsApi, type AnalyticsBundle } from '@/services/analyticsApi';
 import { queryKeys } from '@/services/queryKeys';
 import { cn } from '@/utils/cn';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleAnalytics from './SimpleAnalytics';
 
 type Range = '24H' | '7D' | '30D' | '90D';
 const RANGES: Range[] = ['24H', '7D', '30D', '90D'];
@@ -33,6 +35,9 @@ const THREAT_KEYS = [
 
 /** Security Analytics — time-filtered trends, mixes and detection quality. */
 export default function Analytics() {
+  const { settings } = useSettings();
+  if (settings.uiMode === 'simple') return <SimpleAnalytics />;
+
   const meta = routeMetaFor('/analytics');
   const [range, setRange] = useState<Range>('30D');
 

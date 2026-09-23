@@ -7,9 +7,14 @@ import { IntelSummary } from '@/components/intelligence/IntelSummary';
 import { IntelTable } from '@/components/intelligence/IntelTable';
 import { IndicatorDrawer } from '@/components/intelligence/IndicatorDrawer';
 import type { ThreatIndicator } from '@/types/intelligence';
+import { useSettings } from '@/store/SettingsContext';
+import SimpleThreatIntelligence from './SimpleThreatIntelligence';
 
 /** Threat Intelligence — feed health, indicator grid and full record drawer. */
 export default function ThreatIntelligence() {
+  const { settings } = useSettings();
+  if (settings.uiMode === 'simple') return <SimpleThreatIntelligence />;
+
   const meta = routeMetaFor('/threat-intelligence');
   const [selected, setSelected] = useState<string | null>(null);
 

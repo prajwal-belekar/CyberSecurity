@@ -31,7 +31,7 @@ function Row({ children, label }: { children: React.ReactNode; label: string }) 
 /** Settings — appearance, data freshness, notifications, backend wiring and demo controls. */
 export default function Settings() {
   const meta = routeMetaFor('/settings');
-  const { settings, update, updateNotifications, reset, failureInjection, setFailureInjectionEnabled } = useSettings();
+  const { settings, update, updateNotifications, updateUIMode, reset, failureInjection, setFailureInjectionEnabled } = useSettings();
   const live = useLive();
   const health = useSystemHealth();
   const toast = useToast();
@@ -94,6 +94,15 @@ export default function Settings() {
                 </Button>
               ))}
             </div>
+          </Row>
+
+          <Row label="INTERFACE MODE">
+            <Toggle
+              checked={settings.uiMode === 'simple'}
+              onChange={(value) => updateUIMode(value ? 'simple' : 'analyst')}
+              label="Use Simple Mode"
+              description="Shows a focused security overview with plain-language alerts and fewer navigation options."
+            />
           </Row>
 
           <Row label="REDUCED MOTION">
