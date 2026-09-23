@@ -24,8 +24,7 @@ def seed_data():
                 description="Single credential validation request from an unrecognized client fingerprint.",
                 status=EventStatus.RESOLVED,
                 detection_rule="AUTH-001 unusual-client",
-                event_metadata={},
-                incident_id="INC-2048"
+                event_metadata={}
             ),
             SecurityEvent(
                 event_id="EVT-8842",
@@ -38,8 +37,7 @@ def seed_data():
                 description="Failed password authentication for user \"admin\".",
                 status=EventStatus.INVESTIGATING,
                 detection_rule="AUTH-010 failed-login",
-                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"},
-                incident_id="INC-2048"
+                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"}
             ),
             SecurityEvent(
                 event_id="EVT-8843",
@@ -52,8 +50,7 @@ def seed_data():
                 description="Repeated failure - attempt 12 of 47 within 15 minutes.",
                 status=EventStatus.INVESTIGATING,
                 detection_rule="AUTH-010 failed-login",
-                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"},
-                incident_id="INC-2048"
+                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"}
             ),
             SecurityEvent(
                 event_id="EVT-8844",
@@ -66,8 +63,7 @@ def seed_data():
                 description="Velocity threshold exceeded: 25 failures in under 6 minutes from a single source.",
                 status=EventStatus.INVESTIGATING,
                 detection_rule="AUTH-021 velocity-threshold",
-                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"},
-                incident_id="INC-2048"
+                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"}
             ),
             SecurityEvent(
                 event_id="EVT-8845",
@@ -80,8 +76,7 @@ def seed_data():
                 description="Detection engine correlated 47 failures across 31 distinct usernames from one source.",
                 status=EventStatus.INVESTIGATING,
                 detection_rule="AUTH-044 brute-force-pattern",
-                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"},
-                incident_id="INC-2048"
+                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"}
             ),
             SecurityEvent(
                 event_id="EVT-8846",
@@ -94,8 +89,7 @@ def seed_data():
                 description="Automatic lockout applied after threshold breach. Source added to temporary deny list.",
                 status=EventStatus.CONTAINED,
                 detection_rule="AUTH-050 lockout-enforced",
-                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"},
-                incident_id="INC-2048"
+                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"}
             ),
             SecurityEvent(
                 event_id="EVT-8847",
@@ -108,10 +102,9 @@ def seed_data():
                 description="Incident INC-2048 raised and routed to the on-call analyst queue.",
                 status=EventStatus.INVESTIGATING,
                 detection_rule="SOC-100 auto-incident",
-                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"},
-                incident_id="INC-2048"
+                event_metadata={"threat_id": "THR-1042", "incident_id": "INC-2048"}
             ),
-SecurityEvent(
+            SecurityEvent(
                 event_id="EVT-8848",
                 timestamp=datetime.now(timezone.utc) - timedelta(minutes=4),
                 event_type="Outbound data transfer anomaly",
@@ -122,9 +115,7 @@ SecurityEvent(
                 description="Workstation-07 transferred 340 MB to an external host matched against IOC-0921.",
                 status=EventStatus.NEW,
                 detection_rule="NET-031 egress-anomaly",
-                threat_id="THR-1044",
-                incident_id="INC-2048",
-                event_metadata={"threat_id": "THR-1044", "incident_id": "INC-2048"},
+                event_metadata={"threat_id": "THR-1044", "incident_id": "INC-2048"}
             ),
         ]
 

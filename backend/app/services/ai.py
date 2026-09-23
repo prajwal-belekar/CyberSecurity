@@ -101,14 +101,14 @@ async def investigate_ai(db: Session, question: str, context: Dict[str, Any]) ->
             id=incident.incident_id,
             label=incident.incident_id,
             type="incident",
-            href=f"/incidents/{incident.id}"
+            href=f"/incidents/{incident.incident_id}"
         ))
     if threat:
         citations.append(ChatCitation(
             id=threat.threat_id,
             label=threat.threat_id,
-            type="event",
-            href=f"/threats/{threat.id}"
+            type="threat",
+            href=f"/threats/{threat.threat_id}"
         ))
     # Add top event citations
     for event in events[:4]:
@@ -131,7 +131,8 @@ async def investigate_ai(db: Session, question: str, context: Dict[str, Any]) ->
         source=source,
         target=target,
         time_window=time_window,
-        incident_id=incident_id
+        incident_id=incident_id,
+        threat_id=threat_id
     )
 
     # Call Ollama
@@ -209,7 +210,8 @@ def _build_investigation_prompt(
     source: Optional[str],
     target: Optional[str],
     time_window: str,
-    incident_id: Optional[str] = None
+    incident_id: Optional[str] = None,
+    threat_id: Optional[str] = None
 ) -> str:
     """Build the controlled investigation prompt for Ollama."""
     
