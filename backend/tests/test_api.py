@@ -25,7 +25,9 @@ def override_get_db():
 
 app.dependency_overrides[get_db] = override_get_db
 
-client = TestClient(app)
+@pytest.fixture
+def client():
+    return TestClient(app)
 
 @pytest.fixture(scope="function")
 def db_session():
@@ -140,7 +142,7 @@ def test_data(db_session):
         "indicator": indicator
     }
 
-def test_events_endpoints(test_data):
+def test_events_endpoints(client, test_data):
     """Test events API endpoints."""
     # Test get events list
     response = client.get("/api/events")
@@ -179,7 +181,7 @@ def test_events_endpoints(test_data):
     assert data["page"] == 1
     assert data["page_size"] == 1
 
-def test_threats_endpoints(test_data):
+def test_threats_endpoints(client, test_data):
     """Test threats API endpoints."""
     # Test get threats list
     response = client.get("/api/threats")
@@ -210,7 +212,7 @@ def test_threats_endpoints(test_data):
     data = response.json()
     assert data["total"] >= 1
 
-def test_incidents_endpoints(test_data):
+def test_incidents_endpoints(client, test_data):
     """Test incidents API endpoints."""
     # Test get incidents list
     response = client.get("/api/incidents")
@@ -254,7 +256,7 @@ def test_incidents_endpoints(test_data):
     data = response.json()
     assert data["total"] >= 1
 
-def test_indicators_endpoints(test_data):
+def test_indicators_endpoints(client, test_data):
     """Test indicators API endpoints."""
     # Test get indicators list
     response = client.get("/api/indicators")
@@ -285,7 +287,7 @@ def test_indicators_endpoints(test_data):
     data = response.json()
     assert data["total"] >= 1
 
-def test_incident_evidence_specific():
+def test_incident_evidence_specific(client):
     """Test the specific INC-2048 evidence relationship from seed data."""
     # This test would require the seed data to be loaded
     # For now, we'll test with our test data

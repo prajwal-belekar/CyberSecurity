@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import engine, Base
 from app.routers import auth, events, threats, incidents, indicators, ai
+from app.websocket import router as websocket_router
 # Import models to register them with Base.metadata
 from app.models import User
 from app.models import SecurityEvent
@@ -43,6 +44,7 @@ app.include_router(threats.router, prefix="/api")
 app.include_router(incidents.router, prefix="/api")
 app.include_router(indicators.router, prefix="/api")
 app.include_router(ai.router, prefix="/api")
+app.include_router(websocket_router)
 
 @app.get('/api/health')
 async def health():

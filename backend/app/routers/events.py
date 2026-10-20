@@ -5,14 +5,16 @@ from app.database import get_db
 from app.schemas.events import (
     SecurityEventResponse, 
     SecurityEventListResponse,
-    SecurityEventUpdate
+    SecurityEventUpdate,
+    SecurityEventCreate
 )
 from app.services.events import (
     get_events,
     get_event_by_id,
     get_event_by_event_id,
     update_event_status,
-    update_event
+    update_event,
+    create_event
 )
 from app.enums import Severity, EventStatus
 
@@ -119,3 +121,21 @@ def update_event_status_endpoint(
         )
     
     return updated_event
+
+
+@router.post("/", response_model=SecurityEventResponse, status_code=status.HTTP_201_CREATED)
+def create_event_endpoint(
+    event_data: SecurityEventCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new security event and run detection engine.
+    
+    The detection engine will automatically:
+    - Match against detection rules
+    - Correlate to existing threats or create new ones
+    - Auto-create incidents for high/critical threats
+    """
+    event_dict = event_data.dict()
+    event = create_event(db, event_dict)
+    return event

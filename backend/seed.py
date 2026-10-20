@@ -131,67 +131,7 @@ SecurityEvent(
         for event in events:
             db.add(event)
 
-        db.flush()
-
-        # Create Threats
-        threats = [
-            Threat(
-                threat_id="THR-1042",
-                title="Brute Force Attempt",
-                threat_type="brute_force",
-                severity=Severity.CRITICAL,
-                status=EventStatus.INVESTIGATING,
-                source="192.168.1.42",
-                target="AUTH-SERVICE (10.0.0.16)",
-                first_seen=datetime.now(timezone.utc) - timedelta(minutes=19),
-                last_seen=datetime.now(timezone.utc) - timedelta(minutes=4),
-                occurrences=47,
-                confidence="0.94",
-                detection_rule="AUTH-044 brute-force-pattern",
-                description="A single source produced 47 failed authentication attempts against 31 distinct usernames in under 15 minutes. Username rotation, constant request cadence and a scripted user agent (curl/8.4.0) indicate automated credential stuffing rather than interactive logon.",
-                mitre={"id": "T1110.004", "technique": "Brute Force: Credential Stuffing", "tactic": "Credential Access"},
-                indicators=["192.168.1.42", "curl/8.4.0", "IOC-0921", "user_207"],
-                related_event_ids=["EVT-8841", "EVT-8842", "EVT-8843", "EVT-8844", "EVT-8845", "EVT-8846"],
-                incident_id="INC-2048",
-                recommended_actions=[
-                    "Confirm the account lockout is still enforced on AUTH-SERVICE",
-                    "Add 192.168.1.42 to the perimeter deny list for 24 hours",
-                    "Audit successful logons from the same source in the previous 7 days",
-                    "Force MFA re-enrollment for any account that was targeted",
-                ]
-            ),
-            Threat(
-                threat_id="THR-1044",
-                title="Unusual Network Connection",
-                threat_type="data_exfiltration",
-                severity=Severity.HIGH,
-                status=EventStatus.INVESTIGATING,
-                source="WORKSTATION-07 (192.168.1.42)",
-                target="203.0.113.87:443",
-                first_seen=datetime.now(timezone.utc) - timedelta(minutes=38),
-                last_seen=datetime.now(timezone.utc) - timedelta(minutes=4),
-                occurrences=14,
-                confidence="0.77",
-                detection_rule="NET-031 egress-anomaly",
-                description="Outbound transfer volume from WORKSTATION-07 is 9x its 30-day baseline and terminates at an external host present in threat intelligence indicator IOC-0921. Transfers occur in fixed-size chunks consistent with staged exfiltration.",
-                mitre={"id": "T1048", "technique": "Exfiltration Over Alternative Protocol", "tactic": "Exfiltration"},
-                indicators=["203.0.113.87", "IOC-0921", "192.168.1.42"],
-                related_event_ids=["EVT-8848"],
-                incident_id="INC-2048",
-                recommended_actions=[
-                    "Isolate WORKSTATION-07 from the production VLAN",
-                    "Capture and preserve 24 hours of flow data for forensics",
-                    "Verify whether the destination was reached before or after the lockout",
-                ]
-            ),
-        ]
-
-        for threat in threats:
-            db.add(threat)
-
-        db.flush()
-
-        # Create Incident
+        # Create Incident FIRST (before threats that reference it)
         incident = Incident(
             incident_id="INC-2048",
             title="Brute Force Attempt",
@@ -250,6 +190,64 @@ SecurityEvent(
         )
 
         db.add(incident)
+        db.flush()
+
+        # Create Threats
+        threats = [
+            Threat(
+                threat_id="THR-1042",
+                title="Brute Force Attempt",
+                threat_type="brute_force",
+                severity=Severity.CRITICAL,
+                status=EventStatus.INVESTIGATING,
+                source="192.168.1.42",
+                target="AUTH-SERVICE (10.0.0.16)",
+                first_seen=datetime.now(timezone.utc) - timedelta(minutes=19),
+                last_seen=datetime.now(timezone.utc) - timedelta(minutes=4),
+                occurrences=47,
+                confidence="0.94",
+                detection_rule="AUTH-044 brute-force-pattern",
+                description="A single source produced 47 failed authentication attempts against 31 distinct usernames in under 15 minutes. Username rotation, constant request cadence and a scripted user agent (curl/8.4.0) indicate automated credential stuffing rather than interactive logon.",
+                mitre={"id": "T1110.004", "technique": "Brute Force: Credential Stuffing", "tactic": "Credential Access"},
+                indicators=["192.168.1.42", "curl/8.4.0", "IOC-0921", "user_207"],
+                related_event_ids=["EVT-8841", "EVT-8842", "EVT-8843", "EVT-8844", "EVT-8845", "EVT-8846"],
+                incident_id="INC-2048",
+                recommended_actions=[
+                    "Confirm the account lockout is still enforced on AUTH-SERVICE",
+                    "Add 192.168.1.42 to the perimeter deny list for 24 hours",
+                    "Audit successful logons from the same source in the previous 7 days",
+                    "Force MFA re-enrollment for any account that was targeted",
+                ]
+            ),
+            Threat(
+                threat_id="THR-1044",
+                title="Unusual Network Connection",
+                threat_type="data_exfiltration",
+                severity=Severity.HIGH,
+                status=EventStatus.INVESTIGATING,
+                source="WORKSTATION-07 (192.168.1.42)",
+                target="203.0.113.87:443",
+                first_seen=datetime.now(timezone.utc) - timedelta(minutes=38),
+                last_seen=datetime.now(timezone.utc) - timedelta(minutes=4),
+                occurrences=14,
+                confidence="0.77",
+                detection_rule="NET-031 egress-anomaly",
+                description="Outbound transfer volume from WORKSTATION-07 is 9x its 30-day baseline and terminates at an external host present in threat intelligence indicator IOC-0921. Transfers occur in fixed-size chunks consistent with staged exfiltration.",
+                mitre={"id": "T1048", "technique": "Exfiltration Over Alternative Protocol", "tactic": "Exfiltration"},
+                indicators=["203.0.113.87", "IOC-0921", "192.168.1.42"],
+                related_event_ids=["EVT-8848"],
+                incident_id="INC-2048",
+                recommended_actions=[
+                    "Isolate WORKSTATION-07 from the production VLAN",
+                    "Capture and preserve 24 hours of flow data for forensics",
+                    "Verify whether the destination was reached before or after the lockout",
+                ]
+            ),
+        ]
+
+        for threat in threats:
+            db.add(threat)
+
         db.flush()
 
         # Create Indicators

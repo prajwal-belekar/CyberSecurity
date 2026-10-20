@@ -3,6 +3,8 @@ from sqlalchemy import and_, or_, desc, asc
 from typing import List, Optional, Tuple
 from app.models import SecurityEvent
 from app.enums import Severity, EventStatus
+from app.detection import run_detection_on_new_event
+from app.websocket import notify_new_event
 
 
 def get_events(
@@ -137,4 +139,45 @@ def update_event(db: Session, event_id: int, event_update) -> Optional[SecurityE
             setattr(event, field, value)
         db.commit()
         db.refresh(event)
+    return event
+
+
+def create_event(db: Session, event_data: dict) -> SecurityEvent:
+    """
+    Create a new security event and run detection engine on it.
+    
+    Args:
+        db: Database session
+        event_data: Dictionary with event fields
+        
+    Returns:
+        Created SecurityEvent object
+    """
+    event = SecurityEvent(**event_data)
+    db.add(event)
+    db.flush()
+    
+    run_detection_on_new_event(db, event)
+    
+    db.commit()
+    db.refresh(event)
+    
+    # Send real-time notification
+    event_dict = {
+        "id": event.id,
+        "event_id": event.event_id,
+        "timestamp": event.timestamp.isoformat() if event.timestamp else None,
+        "event_type": event.event_type,
+        "channel": event.channel,
+        "severity": event.severity.value if hasattr(event.severity, 'value') else str(event.severity),
+        "source": event.source,
+        "target": event.target,
+        "description": event.description,
+        "status": event.status.value if hasattr(event.status, 'value') else str(event.status),
+        "detection_rule": event.detection_rule,
+        "threat_id": event.threat_id,
+        "incident_id": event.incident_id,
+    }
+    notify_new_event(event_dict)
+    
     return event
