@@ -9,7 +9,7 @@ from app.models import SecurityEvent, Indicator
 router = APIRouter(prefix="/phishing", tags=["phishing"])
 
 
-@router.get("/analyze", response_model=SuccessResponse)
+@router.post("/analyze", response_model=SuccessResponse)
 def phishing_analyze(
     url: str = Query(..., description="URL to analyze"),
     db: Session = Depends(get_db)
